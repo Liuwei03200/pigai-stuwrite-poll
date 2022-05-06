@@ -21,7 +21,12 @@
     </el-card>
     <el-card class="score" shadow="hover">
       <div class="nav_bar">分数：</div>
-      <div class="tips">答题后，点击提交查看分数</div>
+      <div class="circle" v-if="data.score!=undefined ">
+        <el-progress stroke-width="10"  type="circle" :percentage="data.score*100" :format="formatScore" ></el-progress>
+        <p v-if="data.score == 1">答对了，你真棒！</p>
+        <p v-else>别灰心，继续努力！</p>
+     </div>
+      <div class="tips" v-else>答题后，点击提交查看分数</div>
     </el-card>
   </div>
 </template>
@@ -38,13 +43,21 @@ export default {
       type: Object,
     },
   },
+  created(){
+        console.log(this.data.score);
+  },
   methods: {
     subscore() {
       let data = this.data.score_input.replace("__input__", this.textarea);
       getScore(this.data.score_func, data).then((res) => {
         console.log(res);
+        this.$emit('updateScore',res);
       });
     },
+    formatScore(val){
+      console.log(val);
+      return val+'';
+    }
   },
 };
 </script>
@@ -76,7 +89,7 @@ export default {
   .score {
     flex: 2;
     margin-left: 5px;
-    .tips {
+    .tips, .circle {
       margin-top: 50px;
       text-align: center;
     }

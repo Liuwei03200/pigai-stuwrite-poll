@@ -30,7 +30,7 @@
           <div class="info">
             <div style="height: 100%" v-if="tidsData">
               <template v-for="(v, k, n) in tidsData" v-if="n == num">
-                <Reorder v-if="v.type == 'reorder'" :data="v" />
+                <Reorder v-if="v.type == 'reorder'" :data="v" @updateScore="updateScore" />
               </template>
             </div>
             <!-- <Score
@@ -80,6 +80,11 @@ export default {
       rid: "2642549",
       num: 0, //当前tid
       tidsData: null, // 当前rid 的所有tid信息
+      intro: {
+        tids: null,
+        mode: "step",
+        title: "",
+      },
       typeName: {
         select: "选择",
         scoring: "打分",
@@ -87,11 +92,6 @@ export default {
         polish: "润色",
         reorder: "连词成句",
         sntupgrade: "句式升格",
-      },
-      intro: {
-        tids: null,
-        mode: "step",
-        title: "",
       },
     };
   },
@@ -123,6 +123,11 @@ export default {
         console.log(data);
         this.tidsData = data;
       });
+    },
+    updateScore(val){
+      this.$set(this.tidsData[this.intro.tids[this.num]],'score',val);
+      // this.tidsData[this.intro.tids[this.num]].score = val;
+      console.log(this.tidsData);
     },
   },
 };
