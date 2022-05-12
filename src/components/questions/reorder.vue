@@ -28,7 +28,7 @@
      </div>
       <div class="tips" v-else>答题后，点击提交查看分数</div>
     </el-card>
-  </div>
+  </div> 
 </template>
 <script>
 import { getScore } from "@/api/index.js";
