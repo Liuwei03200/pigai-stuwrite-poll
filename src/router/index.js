@@ -10,6 +10,11 @@ const routes = [
     name: 'Home',
     component: Home
   },
+  {
+    path: '/write',
+    name: 'Write',
+    component:()=>import('../views/write')
+  },
 ]
 
 const router = new VueRouter({

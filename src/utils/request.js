@@ -3,20 +3,20 @@ import axios from 'axios'
 import QS from 'qs';
 
 // create an axios instance
-let baseurl;
-if(window.location.hostname == 'localhost'){
-  baseurl = '/api'
-}else{
-  baseurl = ''
-}
+// let baseurl;
+// if(window.location.hostname == 'localhost'){
+//   baseurl = '/api'
+// }else{
+//   baseurl = ''
+// }
 
 const service = axios.create({
 	headers: {'Content-Type':'application/x-www-form-urlencoded'},
-	baseURL: baseurl,
+	// baseURL: baseurl,
     timeout: 30000 // request timeout
 })
 service.defaults.withCredentials =true;
-service.baseURL=baseurl;
+// service.baseURL=baseurl;
 
 // 添加请求拦截器
 service.interceptors.request.use(

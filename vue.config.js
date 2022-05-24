@@ -13,12 +13,28 @@ module.exports = {
 		https:false,
 		hotOnly:false,
 		proxy:{
-			"/api":{
-				target:"http://daka.wrask.com",
+			"/api/":{
+				target:"http://www.pigai.org/",
 				secure:false,
 				changeOrigin:true,
 				pathRewrite:{
 					"^/api":""
+				}
+			},
+			"/api/gpu120/":{
+				target:"http://gpu120.wrask.com:8180/",
+				secure:false,
+				changeOrigin:true,
+				pathRewrite:{
+					"^/api/gpu120":""
+				}
+			},
+			"/api/i+1/":{
+				target:"http://daka.wrask.com",
+				secure:false,
+				changeOrigin:true,
+				pathRewrite:{
+					"^/api/i+1":""
 				}
 			},
 		},
