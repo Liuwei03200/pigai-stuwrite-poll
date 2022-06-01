@@ -23,3 +23,6 @@ requests.post("http://gpu120.wrask.com:8180/redis/todsk", json={"essay_or_snts":
 
 
 requests.post("http://gpu120.wrask.com:8184/redis/xadd", json={"essay_or_snts":"Hello world", "rid":"230537","uid":"ZZ"}).json() 　
+
+
+

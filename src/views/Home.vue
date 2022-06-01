@@ -1,7 +1,7 @@
 <template>
     <div class="home">
         <div class="searchDiv">
-            <el-input size="large" placeholder="搜索任务号答题" v-model="rid" class="input-with-select">
+            <el-input size="large" placeholder="搜索任务号答题" v-model.number="rid" class="input-with-select">
                 <el-button slot="append" type="primary" icon="el-icon-search" @click="gowrite()"></el-button>
             </el-input> 
         </div>
@@ -12,22 +12,43 @@ import {getRidRequest} from "../api/index"
 export default {
     data(){
         return{
-            rid:'2669712',
-            essay_topic:'',
+            rid:'',
+            requestUrl:null, // 获取要求的url
+            query:null, // get上获取的json数据
         }
     },
     created(){
-
-    },
-    methods:{
-        gowrite(){
-            getRidRequest(this.rid).then(res=>{
-                console.log(res);
-                this.essay_topic = res.data.request.essay_topic;
+        if(this.$route.query.query!=undefined){
+            this.query = JSON.parse(this.$route.query.query);
+            this.rid = this.query.rid != undefined?this.query.rid:null;
+            if(this.rid!=null){
                 this.$router.push({
                     path:'/write',
                     query:{
-                        essay_topic:this.essay_topic
+                        query:JSON.stringify(this.query)
+                    }
+                })
+                return;
+            }
+        }
+        console.log(this.query);
+        if(this.query !=null){
+            this.requestUrl = query.requestUrl!=undefined?query.requestUrl:null;
+        }
+    },
+    methods:{
+        gowrite(){
+            getRidRequest(this.rid,this.requestUrl).then(res=>{
+                console.log(res);
+                if(res.error != 0){
+                    this.$message.error(res.error_des);
+                    return;
+                }
+                this.$router.push({
+                    path:'/write',
+                    query:{
+                        rid:this.rid,
+                        query:this.query!=null?this.query:undefined
                     }
                 })
             });
