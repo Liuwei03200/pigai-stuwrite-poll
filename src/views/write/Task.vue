@@ -82,7 +82,7 @@
                             </template>
                         </div>
                         <div class="footBtn">
-                            <el-button type="primary" @click="goSubmit(true)">提交批改</el-button>
+                            <el-button type="primary" @click="goSubmit(true)">提交</el-button>
                         </div>
                     </div>
                     <div class="answerCard" v-if="publish.config.showCard">

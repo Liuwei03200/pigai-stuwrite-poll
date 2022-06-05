@@ -45,7 +45,10 @@
                         <template v-if="content.length>0">
                             <el-card class="itemContent" shadow="hover" v-for="v,n in content" :key="n">
                                 <div class="head">
-                                    <div>{{n+1}}. 写作</div>
+                                    <div>{{n+1}}. 写作
+                                         <el-button type="primary" style="margin-left:10px" plain size="mini" icon="el-icon-close" circle @click="delContent(n)" >
+                                        </el-button>
+                                    </div>
                                     <div>
                                         <el-button type="primary" plain size="mini" icon="el-icon-upload2" circle @click="updownContent(n,0)" >
                                         </el-button>
@@ -64,6 +67,11 @@
                                         <el-input style="width:200px;" v-model.number="content[n].submitNum"></el-input>
                                         0 为不限制
                                     </el-form-item> -->
+                                    <el-form-item label="打分公式">
+                                        <el-select v-model="content[n].gongshi" placeholder="请选择活动区域">
+                                            <el-option :label="v[0]" :value="v[1]" v-for="v in gongshi" :key="v[1]"></el-option>
+                                        </el-select>
+                                    </el-form-item>
                                     <el-form-item label="最小字数">
                                         <el-input style="width:200px;" v-model.number="content[n].minWord"></el-input>
                                     </el-form-item>
@@ -175,6 +183,27 @@ export default {
                     school:true
                 }
             },
+            gongshi:[
+                ['默认打分公式',861612],
+                ['雅思大作文',861584],
+                ['雅思小作文',861589],
+                ['四级',861591],
+                ['六级',861593],
+                ['托福',861601],
+                ['本科专四打分公式',861613],
+                ['本科小作文',861616],
+                ['本科专八',861617],
+                ['本科考研',861621],
+                ['应用文书信',861623],
+                ['高中SAT',861627],
+                ['高中',861634],
+                ['初中',861676],
+                ['高职三级',861703],
+                ['高职B级',861705],
+                ['高职A级',861706],
+                ['读后续写',862269],
+                ['研究生长论文',862310]
+            ]
         }
     },
     methods:{
@@ -185,6 +214,7 @@ export default {
                         type:'composition',
                         title:'', //  写作标题
                         request:'', // 写作要求
+                        gongshi:'',
                         minWord:10, // 最小字数
                         maxWord:200, // 最大字数
                         score:100, // 分制  100分
@@ -229,6 +259,9 @@ export default {
                 [this.content[n+1],this.content[n]] = [this.content[n],this.content[n+1]]
             }
             this.$forceUpdate();
+        },
+        delContent(n){
+            this.content.splice(n,1);
         },
         gohref(){
             window.open(`http://py.jukuu.com:8080/zhihui/#/taswrite?id=${this.id}`,'_blank')
