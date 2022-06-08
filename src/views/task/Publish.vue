@@ -66,10 +66,10 @@
               <el-button type="default" @click="addContent('essay')"
                 >写作</el-button
               >
-              <el-button type="default" @click="addContent('underline')"
-                >划词</el-button
-              >
               <el-button type="default" @click="addContent('vacant')"
+                >填空</el-button
+              >
+              <el-button type="default" @click="addContent('underline')"
                 >划词</el-button
               >
             </div>
@@ -82,7 +82,9 @@
               >
                 <div class="head">
                   <div>
-                    {{ n + 1 }}. 写作
+                    {{ n + 1 }}.
+                    <span v-if="content[n].type == 'essay'">写作</span>
+                    <span v-if="content[n].type == 'vacant'">填空</span>
                     <el-button
                       type="primary"
                       style="margin-left: 10px"
@@ -165,6 +167,37 @@
                       v-model.number="content[n].score"
                     ></el-input>
                   </el-form-item>
+                </el-form>
+                <el-form v-if="v.type == 'vacant'">
+                  <el-form-item required="">
+                    <el-input
+                      v-model="content[n].title"
+                      placeholder="请输入标题"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item required="">
+                    <el-input
+                      type="textarea"
+                      rows="5"
+                      placeholder="请输入任务要求"
+                      v-model="content[n].request"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="答案：">
+                    <p v-for="num in content[n].answers.length" :key="num">
+                      <el-input
+                        v-model="content[n].answers[num]"
+                        :placeholder="'答案' + num"
+                      ></el-input>
+                    </p>
+                    <el-button
+                      type="primary"
+                      size="mini"
+                      @click="content[n].answers.push('')"
+                      >新增</el-button
+                    >
+                  </el-form-item>
+                  <el-form-item> </el-form-item>
                 </el-form>
               </el-card>
             </template>
@@ -321,6 +354,8 @@ export default {
   },
   methods: {
     addContent(val) {
+      // 添加题型
+      // 1. 作文题
       if (val == "essay") {
         this.content.push({
           type: "essay",
@@ -332,7 +367,15 @@ export default {
           score: 100, // 分制  100分
         });
       }
-      if (val == "underline" || val == "vacant") {
+      if (val == "vacant") {
+        this.content.push({
+          type: "vacant",
+          title: "",
+          request: "",
+          answers: [""],
+        });
+      }
+      if (val == "underline") {
         this.$message.error("暂不支持");
       }
     },
