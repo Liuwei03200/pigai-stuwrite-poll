@@ -105,45 +105,89 @@
                     shadow="hover"
                     body-style="padding:15px;"
                   >
-                    <div class="titlesW">
-                      <el-input
-                        v-model="content[n].essay_title"
-                        placeholder="请输入标题"
-                      ></el-input>
-                    </div>
-                    <div id="contentsW">
-                      <div id="contentsW_bar">
-                        <div class="contentsW_bar_left">请在下方写入 正文</div>
-                        <div class="contentsW_bar_right">
-                          {{ publish.config.allTime }}分钟后自动提交：{{
-                            alltimeSecond
-                          }}（秒）
+                    <template v-if="content[n].type == 'essay'">
+                      <div class="titlesW">
+                        <el-input
+                          v-model="content[n].essay_title"
+                          placeholder="请输入标题"
+                        ></el-input>
+                      </div>
+                      <!-- 1 作文 -->
+                      <div id="contentsW">
+                        <div id="contentsW_bar">
+                          <div class="contentsW_bar_left">
+                            请在下方写入 正文
+                          </div>
+                          <div class="contentsW_bar_right">
+                            {{ publish.config.allTime }}分钟后自动提交：{{
+                              alltimeSecond
+                            }}（秒）
+                          </div>
+                        </div>
+                        <textarea
+                          style="margin-bottom: -5px"
+                          placeholder="请输入正文......."
+                          class="textarea content_line"
+                          cols="70"
+                          rows="10"
+                          v-model="content[n].essay_or_snts"
+                        ></textarea>
+                        <!-- 草稿自动保存底部栏 -->
+                        <div class="from_bar">
+                          <div>
+                            <span
+                              >字数:<span id="init_wc"
+                                >{{ spss_countwords(content[n].essay_or_snts) }}
+                              </span>
+                              词</span
+                            >
+                            &nbsp;
+                          </div>
+                          <div class="fr">
+                            <span>{{ settime }} 秒后保存</span>
+                          </div>
                         </div>
                       </div>
-                      <textarea
-                        style="margin-bottom: -5px"
-                        placeholder="请输入正文......."
-                        class="textarea content_line"
-                        cols="70"
-                        rows="10"
-                        v-model="content[n].essay_or_snts"
-                      ></textarea>
-                      <!-- 草稿自动保存底部栏 -->
-                      <div class="from_bar">
-                        <div>
-                          <span
-                            >字数:<span id="init_wc"
-                              >{{ spss_countwords(content[n].essay_or_snts) }}
-                            </span>
-                            词</span
-                          >
-                          &nbsp;
-                        </div>
-                        <div class="fr">
-                          <span>{{ settime }} 秒后保存</span>
-                        </div>
+                    </template>
+                    <!-- 2. 填空题 -->
+                    <template>
+                      <div class="">
+                        <el-form>
+                          <el-form-item>
+                            <p>答案：</p>
+                            <p
+                              v-for="num in content[n].essay_or_snts.length"
+                              :key="num"
+                            >
+                              <el-input
+                                style="width: 90%"
+                                v-model="content[n].essay_or_snts[num - 1]"
+                                placeholder="请输入答案"
+                              ></el-input>
+                              <el-button
+                                type="primary"
+                                style="margin-left: 10px"
+                                plain
+                                size="mini"
+                                icon="el-icon-close"
+                                circle
+                                @click="
+                                  content[n].essay_or_snts.splice(num - 1, 1)
+                                "
+                              >
+                              </el-button>
+                            </p>
+                            <el-button
+                              v-if="publish.content[n].setMoreAnswers == true"
+                              type="primary"
+                              size="mini"
+                              @click="content[n].essay_or_snts.push('')"
+                              >+ 新增</el-button
+                            >
+                          </el-form-item>
+                        </el-form>
                       </div>
-                    </div>
+                    </template>
                   </el-card>
                 </div>
               </template>
@@ -264,11 +308,22 @@ export default {
       //初始化 答题内容
       let arr = [];
       for (let key in this.publish.content) {
-        let obj = {
-          essay_title: "",
-          essay_or_snts: "",
-          type: this.publish.content[key].type,
-        };
+        let obj = null;
+        // 1 作文
+        if (this.publish.content[key].type == "essay") {
+          obj = {
+            essay_title: "",
+            essay_or_snts: "",
+            type: this.publish.content[key].type,
+          };
+        } else if (this.publish.content[key].type == "vacant") {
+          // 2 填空
+          obj = {
+            essay_or_snts: [""],
+            type: this.publish.content[key].type,
+          };
+        } else {
+        }
         arr.push(obj);
       }
       this.content = arr;
@@ -309,35 +364,36 @@ export default {
     },
     goSubmit(state) {
       if (state) {
-        // 字数限制 最大词最小词
         for (let key in this.content) {
-          if (
-            this.spss_countwords(this.content[key].essay_or_snts) <
-            this.publish.content[key].minWord
-          ) {
-            this.$message.error(
-              `第${Number(key) + 1}题正文内容请大于${
-                this.publish.content[key].minWord
-              }个词`
-            );
-            return;
-          }
-          if (
-            this.spss_countwords(this.content[key].essay_or_snts) >
-            this.publish.content[key].maxWord
-          ) {
-            this.$message.error(
-              `第${Number(key) + 1}题正文内容请小于${
-                this.publish.content[key].maxWord
-              }个词`
-            );
-            return;
+          // 字数限制 最大词最小词 _____作文类型
+          if (this.content[key].type == "essay") {
+            if (
+              this.spss_countwords(this.content[key].essay_or_snts) <
+              this.publish.content[key].minWord
+            ) {
+              this.$message.error(
+                `第${Number(key) + 1}题正文内容请大于${
+                  this.publish.content[key].minWord
+                }个词`
+              );
+              return;
+            }
+            if (
+              this.spss_countwords(this.content[key].essay_or_snts) >
+              this.publish.content[key].maxWord
+            ) {
+              this.$message.error(
+                `第${Number(key) + 1}题正文内容请小于${
+                  this.publish.content[key].maxWord
+                }个词`
+              );
+              return;
+            }
           }
         }
         clearInterval(this.setInterval);
         clearInterval(this.alltimeSetInterval);
       }
-      let successAlert = false;
       let promiseall = [];
       for (let key in this.content) {
         let data = {
@@ -349,6 +405,7 @@ export default {
           essay_or_snts: this.content[key].essay_or_snts,
           type: this.content[key].type,
         };
+        // console.log(data);
         promiseall[key] = subWriteData(
           `${this.id}-${key}`,
           JSON.stringify(data)

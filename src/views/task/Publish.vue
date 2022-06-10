@@ -183,12 +183,24 @@
                       v-model="content[n].request"
                     ></el-input>
                   </el-form-item>
-                  <el-form-item label="答案：">
+                  <el-form-item>
+                    <div>答案</div>
                     <p v-for="num in content[n].answers.length" :key="num">
                       <el-input
-                        v-model="content[n].answers[num]"
+                        v-model="content[n].answers[num - 1]"
                         :placeholder="'答案' + num"
+                        style="width: 90%"
                       ></el-input>
+                      <el-button
+                        type="primary"
+                        style="margin-left: 10px"
+                        plain
+                        size="mini"
+                        icon="el-icon-close"
+                        circle
+                        @click="content[n].answers.splice(num - 1, 1)"
+                      >
+                      </el-button>
                     </p>
                     <el-button
                       type="primary"
@@ -197,7 +209,9 @@
                       >新增</el-button
                     >
                   </el-form-item>
-                  <el-form-item> </el-form-item>
+                  <el-form-item label="允许多个答案">
+                    <el-switch v-model="content[n].setMoreAnswers"></el-switch>
+                  </el-form-item>
                 </el-form>
               </el-card>
             </template>
@@ -373,6 +387,7 @@ export default {
           title: "",
           request: "",
           answers: [""],
+          setMoreAnswers: false,
         });
       }
       if (val == "underline") {
